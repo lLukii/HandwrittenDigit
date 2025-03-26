@@ -1,7 +1,7 @@
 import pygame, copy
 
 screen = pygame.display.set_mode((720, 720)) 
-  
+    
 pygame.display.set_caption('Neural Network') 
 screen.fill((255, 255, 255)) 
 clock = pygame.time.Clock()
