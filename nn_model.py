@@ -17,7 +17,7 @@ train_dataset = datasets.MNIST(
 )
 test_dataset = datasets.MNIST(
     root='./data', 
-    train=True, 
+    train=False, 
     download=True, 
     transform=transform
 )
@@ -37,18 +37,27 @@ class NeuralNetwork(nn.Module):
             nn.ReLU(),
             nn.Linear(hidden_size, hidden_size),
             nn.ReLU(),
-            nn.Linear(hidden_size, output_size),
+            nn.Linear(hidden_size, hidden_size),
+            nn.ReLU(),
+            nn.Linear(hidden_size, output_size)
         )
     
     def forward(self, x):
         x = self.flatten(x)
         output = self.linear_relu_forward(x)
         return output
+    
+    def xavierInit(self):
+        for m in self.modules():
+            if isinstance(m, nn.Linear):
+                nn.init.xavier_uniform_(m.weight)
 
 model = NeuralNetwork()
+model.xavierInit()
 loss_func = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
-epochs = 10
+epochs = 12
+
 
 loss_cache = []
 def train_loop(dataloader):
@@ -84,14 +93,9 @@ def train_model():
         test_loop(test_loader)
 
 def test_on_handwriting(data):
-    data = torch.Tensor(data).reshape(1, 28, 28)
-    print(data)
-    pred = model(data)
+    model.eval() 
+    data = torch.Tensor(data).reshape(1, 28, 28).to(torch.float32)
+    with torch.no_grad():
+        pred = model(data)
+    print(pred)
     return int(pred.argmax(1))
-
-
-
-
-
-
-

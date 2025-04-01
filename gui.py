@@ -1,6 +1,8 @@
 import pygame, copy, nn_model
+import matplotlib.pyplot as plt
+
 print("Let's make this program not dumb")
-# nn_model.train_model()
+nn_model.train_model()
 pygame.init()
 
 screen = pygame.display.set_mode((720, 720))     
@@ -14,11 +16,14 @@ hitboxes = [[0] * 28 for _ in range(28)]
 inputs = copy.deepcopy(hitboxes)
 font = pygame.font.Font(pygame.font.get_default_font(), 40)
 
+dx = [0, 0, -1, 1]
+dy = [1, -1, 0, 0]
+
 TILE_SIZE = 15
 TILE_X, TILE_Y = 100, 100
 for i in range(28):
     for j in range(28):
-        rect = pygame.Rect(TILE_X + i*TILE_SIZE, TILE_Y + j*TILE_SIZE, TILE_SIZE, TILE_SIZE)
+        rect = pygame.Rect(TILE_X + j*TILE_SIZE, TILE_Y + i*TILE_SIZE, TILE_SIZE, TILE_SIZE)
         hitboxes[i][j] = rect
 
 def generate_button(text, rect):
@@ -51,6 +56,10 @@ while running:
         for j in range(28):
             if hitboxes[i][j].collidepoint(mpos) and click: 
                 inputs[i][j] = 1
+                for x, y in zip(dx, dy):
+                    try: inputs[i+x][j+y] = 1
+                    except: continue
+                
             pygame.draw.rect(screen, (0,0,0), hitboxes[i][j], inputs[i][j] ^ 1)
 
     guess_b = pygame.Rect(360, 600, 50, 50)
